@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Map</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v1.11.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0;}
+        #map { position: absolute ; top: 0; bottom: 0; width: 100%;}
+        .map-overlay{
+            position:absolute;
+            left:0;
+            padding:10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"  text-align:"center"></div>
+
+    <div class="map-overlay top">
+        <button  style = "font-size: 2em;">
+            Curent tracking of Bus Route #1
+        </button>
+    </div>
+
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1Ijoia2Vubnlncm9zejEiLCJhIjoiY2tmY2syaHdhMDIycDJ6cnFyZTBpOWFoMyJ9.fI3glWrrdzyAgF9Wss5psA'
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [-71.091542, 42.358862],
+        zoom: 12
+    });
+
+
+    async function run(){
+        const locations = await getBusLocations();
+        console.log(new Date());
+        console.log(locations);
+
+        // delete current markers
+
+        var busMarkers = [];
+
+        for (let i=0; i<locations.length; i++){
+            printMarker(busMarkers,[locations[i].attributes.longitude, locations[i].attributes.latitude],locations[i].attributes.label)
+        }
+        
+        
+
+        // timer
+        setTimeout(() =>{
+            if (busMarkers!==null) {
+            for (let i = busMarkers.length - 1; i >= 0; i--) {
+                busMarkers[i].remove();}}
+            run()}, 15000)  
+    }
+
+    async function getBusLocations(){
+        const url = "https://api-v3.mbta.com/vehicles?filter[route]=1&include=trip";
+        const response = await fetch(url);
+        const json = await response.json();
+        return json.data;
+    }
+
+
+    async function printMarker(busMarkers,LatLong, id){
+        var popup = new mapboxgl.Popup()
+            .setText("Bus ID: " + id.toString());
+        var marker = new mapboxgl.Marker()
+            .setLngLat(LatLong)
+            .setPopup(popup)
+            .addTo(map);
+        busMarkers.push(marker)
+    }
+
+
+
+    run();
+
+        
+
+</script>
+</body>
+</html>
