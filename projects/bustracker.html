@@ -43,12 +43,10 @@
         // delete current markers
 
         var busMarkers = [];
-        var c = 0;
 
         for (let i=0; i<locations.length; i++){
-            if (location[c].attributes.current_stop_sequence !== null){
-                printMarker(busMarkers,[locations[c].attributes.longitude, locations[c].attributes.latitude],locations[c].attributes.label)
-                c++;
+            if (locations[i].attributes.current_stop_sequence !== null){
+                printMarker(busMarkers,[locations[i].attributes.longitude, locations[i].attributes.latitude],locations[i].attributes.label);
             }
         }
         
